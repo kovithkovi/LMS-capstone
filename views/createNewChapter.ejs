@@ -9,22 +9,23 @@
 </head>
 
 <body>
-    <form action="/chapter/new" method="post">
+    <form action="/Newchapter" method="post">
         <div class="grid grid-cols-6">
             <div class="col-span-2 col-start-2">
                 <h2 class="text-4xl mt-12">
                     Create Chapter
                 </h2>
             </div>
+            <input type="hidden" name="courseId" value="<%= courseId %>">
             <div class="col-span-3 col-start-2 mt-12">
                 <label for="cName" class="text-xl my-3">What is the name of the chapter?</label>
-                <input type="text" id="cName"
+                <input type="text" id="cName" name="cName"
                     class="rounded font-semibold w-full my-1 p-2 border border-gray-600 leading-10 text-2xl">
             </div>
             <div class="col-span-3 col-start-2 mt-8">
                 <label for="description" class="text-xl my-3">Description</label>
                 <textarea class="h-24 w-full resize-none border border-gray-600 rounded mt-1 p-2 font-large" rows="5"
-                    id="description"></textarea>
+                    id="description" name="description"></textarea>
             </div>
             <div class="col-span-2 col-start-2">
                 <button

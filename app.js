@@ -4,6 +4,7 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const { Course, Chapter, Page } = require("./models");
+const course = require("./models/course");
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -38,9 +39,9 @@ app.post("/course", async (request, response) => {
   try {
     console.log("Request Body:", request.body.name);
     const course = request.body.name;
-    await Course.addCourse(course);
-    // Redirect to "/chapter" without passing data
-    response.redirect("/chapter");
+    console.log(course);
+    const newCourse = await Course.addCourse(course);
+    response.redirect(`/chapter/${newCourse.id}`);
   } catch (err) {
     console.error(err);
     response.status(500).json(err);
@@ -48,14 +49,15 @@ app.post("/course", async (request, response) => {
 });
 
 // Define GET route for "/chapter" at the top level
-app.get("/chapter", async (request, response) => {
+app.get("/chapter/:courseId", async (request, response) => {
   try {
-    // Retrieve course data or pass it in some way
-    const course = "someCourseName"; // Replace with the actual course data
-    const chapters = await Chapter.getChapters();
+    const courseId = request.params.courseId;
+    const course = await Course.findByPk(courseId);
+    const chapters = await Chapter.getChaptersRespective(courseId);
     response.render("Chapter", {
-      course,
+      courseName: course.name,
       chapters,
+      courseId,
     });
   } catch (err) {
     console.error(err);
@@ -63,27 +65,73 @@ app.get("/chapter", async (request, response) => {
   }
 });
 
-app.get("/chapter/new", async (request, response) => {
-  const chapters = await Chapter.getChapters();
+app.get("/Newchapter/:courseId", async (request, response) => {
+  const courseId = request.params.courseId;
+  // const chapters = await Chapter.getChaptersRespective(courseId);
+  // console.log(courseId);
   if (request.accepts("html")) {
     response.render("createNewChapter", {
-      chapters,
+      courseId,
     });
   } else {
     response.json({
-      chapters,
+      courseId,
     });
   }
 });
 
-app.post("/chapter/new", async (request, response) => {
+app.post("/Newchapter", async (request, response) => {
   try {
-    await Chapter.addChapter({
-      cname: request.body.cname,
-      description: request.body.description,
+    const courseid = request.body.courseId;
+    console.log(request.body.cName);
+    console.log(request.body.description);
+    console.log(courseid);
+    await Chapter.addChapter(
+      request.body.cName,
+      request.body.description,
+      courseid
+    );
+    response.redirect(`/chapter/${courseid}`);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+app.get("/pages/:chapterId", async (request, response) => {
+  try {
+    const chapterId = await request.params.chapterId;
+    const chapter = await Chapter.getChapter(chapterId);
+    const pages = await Page.getPagesRespective(chapterId);
+    console.log(pages);
+    response.render("Pages", { chapterName: chapter.Cname, pages, chapterId });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+app.get("/Newpage/:chapterId", async (request, response) => {
+  try {
+    const chapterId = request.params.chapterId;
+    console.log(chapterId);
+    response.render("createNewPage", {
+      chapterId,
     });
   } catch (err) {
     console.log(err);
   }
 });
+
+app.post("/Newpages", async (request, response) => {
+  try {
+    await Page.addPages(
+      request.body.title,
+      request.body.content,
+      request.body.chapterId
+    );
+    response.redirect(`/pages/${request.body.chapterId}`);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 module.exports = app;

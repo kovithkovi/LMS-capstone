@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <form action="/Newpages" method="post">
+        <div class="grid grid-cols-6">
+            <div class="col-start-2 col-span-2">
+                <h2 class="text-4xl mt-12">New Page</h2>
+            </div>
+            <div class="col-span-3 col-start-2 mt-12">
+                <label for="title" class="text-xl font-semibold">Title</label>
+                <input type="text" name="title"
+                    class="rounded font-medium w-full my-1 p-2 border border-gray-600 leading-10 text-2xl" id="title">
+            </div>
+            <div class="col-span-3 col-start-2 mt-12">
+                <label for="content" class="text-xl my-3 font-semibold">Content</label>
+                <textarea class="h-24 w-full resize-none border border-gray-600 rounded mt-1 p-2 font-large" rows="5"
+                    id="content" name="content"></textarea>
+            </div>
+            <input type="hidden" name="chapterId" value="<%= chapterId %>">
+            <div class="col-span-2 col-start-2">
+                <button
+                    class="rounded text-white bg-green-600 py-1 px-3 hover:bg-green-900  mt-8 text-xl">Submit</button>
+            </div>
+        </div>
+    </form>
+</body>
+
+</html>

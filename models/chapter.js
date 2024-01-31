@@ -9,9 +9,35 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Chapter.belongsTo(models.Course, {
+        foreignKey: "courseId",
+      });
+
+      // A Chapter has many Pages with a foreign key named "chapterId"
+      Chapter.hasMany(models.Page, {
+        foreignKey: "chapterId",
+      });
     }
     static getChapters() {
       return this.findAll({});
+    }
+
+    static getChapter(chapterId) {
+      return this.findByPk(chapterId);
+    }
+    static getChaptersRespective(courseId) {
+      return this.findAll({
+        where: {
+          courseId,
+        },
+      });
+    }
+    static addChapter(cname, description, courseId) {
+      return this.create({
+        Cname: cname,
+        description,
+        courseId,
+      });
     }
   }
   Chapter.init(

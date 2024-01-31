@@ -12,33 +12,32 @@
     <div class="grid grid-cols-6">
         <div class="col-start-2 col-span-2">
             <h1 class="mt-12 text-5xl">
-                <%= courseName %>
+                <%= chapterName %>
             </h1>
         </div>
         <div class="col-start-2 col-span-4 mt-6 border-t-2 border-black "></div>
         <div class="col-start-2 col-span-2">
             <h2 class="mt-12 text-4xl">
-                Chapters
+                Pages
             </h2>
         </div>
         <div class="col-start-2 col-span-2">
-            <% if (chapters.length!==0) { %>
+            <% if (pages.length!==0) { %>
                 <ul class="mt-5 text-2xl">
-                    <% for (let i=0; i < chapters.length; i++) { %>
+                    <% for (let i=0; i < pages.length; i++) { %>
                         <li class="border border-black mt-1">
-                            <a href="/pages/<%= chapters[i].id %>" class="p-2">
-                                <%= chapters[i].Cname %>
+                            <a href="" class="p-2">
+                                <%= pages[i].title %>
                             </a>
                         </li>
                         <% } %>
                 </ul>
                 <% } else { %>
-                    <p class="mt-5 text-2xl">There are no chapters available. Create one?</p>
+                    <p class="mt-5 text-2xl">There are no Pages available. Create one?</p>
                     <% } %>
-                        <input type="hidden" name="courseId" id="" value="<%= courseId %>">
-                        <button onclick='window.location.href="/Newchapter/<%= courseId %>"'
+                        <button onclick='window.location.href="/Newpage/<%= chapterId %>"'
                             class="rounded text-white bg-green-600 py-2 px-5 hover:bg-green-900 font-medium mt-6">Create
-                            a new chapter</button>
+                            a new page</button>
         </div>
     </div>
 </body>

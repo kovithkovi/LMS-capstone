@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
@@ -9,6 +10,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Course.hasMany(models.Chapter, {
+        foreignKey: "courseId",
+      });
     }
 
     static getCourse() {
@@ -16,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     static addCourse(name) {
-      return this.create(name);
+      return this.create({ name });
     }
   }
   Course.init(
