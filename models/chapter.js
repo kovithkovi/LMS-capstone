@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
@@ -43,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
   Chapter.init(
     {
       Cname: DataTypes.STRING,
-      description: DataTypes.STRING,
+      description: DataTypes.TEXT,
     },
     {
       sequelize,

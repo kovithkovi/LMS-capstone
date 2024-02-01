@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .my-description {
+            white-space: pre-wrap;
+        }
+    </style>
+    <script>
+        function PageUpdate(id) {
+            // console.log(id)
+            fetch(`/pages/${id}/markAsCompleted`, {
+                method: "put",
+                headers: { "Content-Type": "application/json" },
+                // body: JSON.stringify({
+                //     "_csrf": token,
+                // })
+            })
+                .then((res) => {
+                    window.location.reload();
+                })
+                .catch((err) => console.error(err))
+        };
+    </script>
+</head>
+
+<body>
+    <div class="grid grid-cols-12">
+        <div class="col-start-2 col-span-12 mt-12">
+            <h1 class="text-4xl">
+                <%= title %>
+            </h1>
+            <div class="col-span-12 col-start-2 mt-10 my-description">
+                <%= content %>
+            </div>
+        </div>
+        <div class="col-start-2 col-span-3">
+            <% if (completed===false) { %>
+                <button onclick="PageUpdate(<%= id %>)"
+                    class="rounded text-white bg-green-600 py-2 px-5 hover:bg-green-900 font-medium mt-5 text-xl">Mark
+                    as complete</button>
+                <% } else { %>
+                    <button
+                        class="rounded text-white bg-green-900 py-2 px-5 font-medium mt-5 text-xl">Completed</button>
+                    <% } %>
+        </div>
+        <div class="col-start-9 col-span-2">
+            <button onclick="window.location.href='/page/<%= id + 1 %>'"
+                class="rounded text-white bg-blue-600 py-2 px-5 hover:bg-blue-900 font-medium mt-5 text-xl">Next</button>
+        </div>
+    </div>
+</body>
+
+</html>

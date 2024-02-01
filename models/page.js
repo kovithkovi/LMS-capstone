@@ -26,8 +26,16 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
+    static getPage(pageId) {
+      return this.findByPk(pageId);
+    }
+
     static addPages(title, content, chapterId) {
       return this.create({ title, content, chapterId });
+    }
+
+    markAsCompleted() {
+      return this.update({ isCompleted: true });
     }
   }
   Page.init(

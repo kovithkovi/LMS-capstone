@@ -22,6 +22,25 @@ module.exports = (sequelize, DataTypes) => {
     static addCourse(name) {
       return this.create({ name });
     }
+    static getEnroll() {
+      return this.findAll({
+        where: {
+          enroll: true,
+        },
+      });
+    }
+
+    static getAvailable() {
+      return this.findAll({
+        where: {
+          enroll: false,
+        },
+      });
+    }
+
+    enrolled() {
+      return this.update({ enroll: true });
+    }
   }
   Course.init(
     {

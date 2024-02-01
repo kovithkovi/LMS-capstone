@@ -13,9 +13,25 @@ app.use(express.json());
 
 // Define GET and POST routes for "/educator"
 app.get("/educator", async (request, response) => {
-  response.render("educator.ejs");
+  const Availablecourse = await Course.getAvailable();
+  const enrollCourses = await Course.getEnroll();
+  response.render("educator.ejs", {
+    Availablecourse,
+    enrollCourses,
+  });
 });
 
+app.put("/course/:courseId/enroll", async (request, response) => {
+  console.log(request.params.courseId);
+  const course = await Course.findByPk(request.params.courseId);
+  console.log(course);
+  try {
+    await course.enrolled();
+    console.log(course.enroll);
+  } catch (err) {
+    console.log(err);
+  }
+});
 // Define GET and POST routes for "/course"
 app.get("/course", async (request, response) => {
   try {
@@ -129,6 +145,30 @@ app.post("/Newpages", async (request, response) => {
       request.body.chapterId
     );
     response.redirect(`/pages/${request.body.chapterId}`);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+app.get("/page/:pageId", async (request, response) => {
+  console.log(request.params.pageId);
+  const page = await Page.getPage(request.params.pageId);
+
+  // console.log(page.isCompleted);
+  response.render("displayPages", {
+    id: page.id,
+    title: page.title,
+    content: page.content,
+    completed: page.isCompleted,
+  });
+});
+
+app.put("/pages/:pageId/markAsCompleted", async (request, response) => {
+  console.log(request.params.pageId);
+  const page = await Page.findByPk(request.params.pageId);
+  try {
+    await page.markAsCompleted();
+    console.log(page.isCompleted);
   } catch (err) {
     console.log(err);
   }
