@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 "use strict";
-const { Model } = require("sequelize");
+const { Model, Op } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
   class Course extends Model {
     /**
@@ -13,38 +14,49 @@ module.exports = (sequelize, DataTypes) => {
       Course.hasMany(models.Chapter, {
         foreignKey: "courseId",
       });
+
+      Course.belongsTo(models.User, {
+        foreignKey: "userId",
+      });
     }
 
     static getCourse() {
       return this.findAll();
     }
 
-    static addCourse(name) {
-      return this.create({ name });
+    static addCourse(name, userId) {
+      return this.create({ name, userId });
     }
-    static getEnroll() {
+
+    static getEnroll(userId) {
       return this.findAll({
         where: {
-          enroll: true,
+          enroll: {
+            [Op.contains]: [userId],
+          },
         },
       });
     }
 
-    static getAvailable() {
+    static getAvailable(userId) {
       return this.findAll({
-        where: {
-          enroll: false,
-        },
+        where: sequelize.literal(`NOT ${userId} = ANY("Course"."enroll")`),
       });
     }
 
-    enrolled() {
-      return this.update({ enroll: true });
+    enrolled(userId) {
+      return this.update({
+        enroll: sequelize.fn("array_append", sequelize.col("enroll"), userId),
+      });
     }
   }
   Course.init(
     {
       name: DataTypes.STRING,
+      enroll: {
+        type: DataTypes.ARRAY(DataTypes.INTEGER),
+        defaultValue: [],
+      },
     },
     {
       sequelize,

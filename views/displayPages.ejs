@@ -49,10 +49,13 @@
                         class="rounded text-white bg-green-900 py-2 px-5 font-medium mt-5 text-xl">Completed</button>
                     <% } %>
         </div>
-        <div class="col-start-9 col-span-2">
-            <button onclick="window.location.href='/page/<%= id + 1 %>'"
-                class="rounded text-white bg-blue-600 py-2 px-5 hover:bg-blue-900 font-medium mt-5 text-xl">Next</button>
-        </div>
+        <% if (noPages> id) { %>
+            <div class="col-start-9 col-span-2">
+                <button onclick="window.location.href='/page/<%= id + 1 %>'"
+                    class="rounded text-white bg-blue-600 py-2 px-5 hover:bg-blue-900 font-medium mt-5 text-xl">Next</button>
+            </div>
+            <% } %>
+
     </div>
 </body>
 

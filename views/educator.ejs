@@ -8,18 +8,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         function enroll(id) {
-            // console.log(id)
             fetch(`/course/${id}/enroll`, {
                 method: "put",
                 headers: { "Content-Type": "application/json" },
-                // body: JSON.stringify({
-                //     "_csrf": token,
-                // })
             })
-                .then((res) => {
+                .then(() => {
+                    console.log("Enrollment successful, reloading page");
                     window.location.reload();
                 })
-                .catch((err) => console.error(err))
+                .catch((err) => console.error(err));
         };
     </script>
 </head>
@@ -27,7 +24,10 @@
 <body>
     <div class="grid grid-cols-5">
         <div class="col-start-2 col-span-2 my-6 flex">
-            <h1 class="text-5xl">Welcome username</h1>
+            <h1 class="text-5xl">Welcome <%= userName %>
+            </h1>
+        </div>
+        <div class="col-start-4 flex items-center justify-center">
             <button onclick="window.location.href='/signout'"
                 class="rounded text-white bg-red-600 py-1 px-3 hover:bg-red-900 font-medium m-2 ">SignOut</button>
         </div>
@@ -51,16 +51,18 @@
     <% if (enrollCourses.length!==0) { %>
         <div class="grid grid-cols-12">
             <div class="col-start-6 col-span-4 mt-5">
-                <h2 class="text-3xl">Enroll Courses</h2>
+                <h2 class="text-3xl">Enrolled Courses</h2>
             </div>
         </div>
         <div class="grid grid-cols-6 mt-8">
             <% for (let i=0; i < enrollCourses.length; i++) { %>
                 <div class="col-start-<%= i%4 + 2 %> border border-black mb-5 mx-2">
                     <h2 class="text-2xl p-2 mb-1 text-center mt-4">
-                        <%= enrollCourses[i].name %>
+                        <strong>
+                            <%= enrollCourses[i].name %>
+                        </strong>
                     </h2>
-                    <div class="ml-4 mt-4 mb-4">
+                    <div class="flex items-center justify-center mt-4 mb-4">
                         <button class="text-white bg-green-600 py-1 px-3 hover:bg-green-900 font-medium m-2"
                             onclick="window.location.href='/chapter/<%= i + 1 %>'">
                             View Course
@@ -68,37 +70,40 @@
                     </div>
                 </div>
                 <% } %>
-
                     <% } %>
-                        <div class="grid grid-cols-12">
-                            <div class="col-start-6 col-span-4 mt-5">
-                                <h2 class="text-3xl">Available Courses</h2>
+        </div>
+        <div class="grid grid-cols-12">
+            <div class="col-start-6 col-span-4 mt-5">
+                <h2 class="text-3xl">Available Courses</h2>
+            </div>
+        </div>
+        <div class="grid grid-cols-6 mt-8">
+            <% if (Availablecourse.length===0) { %>
+                <div class="col-start-3 col-span-4">
+                    <p class="text-5xl">No courses are Available</p>
+                </div>
+                <% } else { %>
+                    <% for (let i=0; i < Availablecourse.length; i++) { %>
+                        <div class="col-start-<%= i%4 + 2 %> border border-black mb-5 mx-2">
+                            <h2 class="text-2xl p-2 mb-1 text-center mt-4">
+                                <strong>
+                                    <%= Availablecourse[i].name %>
+                                </strong>
+                            </h2>
+                            <div class="ml-4 mt-4 mb-4">
+                                <button class="text-white bg-green-600 py-1 px-3 hover:bg-green-900 font-medium m-2"
+                                    onclick="window.location.href='/chapter/<%= Availablecourse[i].id %>'">
+                                    View Course
+                                </button>
+                                <button onclick="enroll(<%= Availablecourse[i].id %>)"
+                                    class="rounded text-white bg-cyan-500 py-1 px-3 hover:bg-cyan-900 font-medium m-2">
+                                    Enroll
+                                </button>
                             </div>
                         </div>
-                        <div class="grid grid-cols-6 mt-8">
-                            <% if (Availablecourse.length===0) { %>
-                                <p>No courses are Available</p>
-                                <% } else { %>
-                                    <% for (let i=0; i < Availablecourse.length; i++) { %>
-                                        <div class="col-start-<%= i%4 + 2 %> border border-black mb-5 mx-2">
-                                            <h2 class="text-2xl p-2 mb-1 text-center mt-4">
-                                                <%= Availablecourse[i].name %>
-                                            </h2>
-                                            <div class="ml-4 mt-4 mb-4">
-                                                <button
-                                                    class="text-white bg-green-600 py-1 px-3 hover:bg-green-900 font-medium m-2"
-                                                    onclick="window.location.href='/chapter/<%= i + 1 %>'">
-                                                    View Course
-                                                </button>
-                                                <button onclick="enroll(<%= Availablecourse[i].id %>)"
-                                                    class="rounded text-white bg-cyan-500 py-1 px-3 hover:bg-cyan-900 font-medium m-2">
-                                                    Enroll
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <% } %>
-                                            <% } %>
-                        </div>
+                        <% } %>
+                            <% } %>
+        </div>
 
 </body>
 
