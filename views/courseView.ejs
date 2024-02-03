@@ -6,6 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chapter</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script>
+        function enroll(id) {
+            fetch(`/course/${id}/enroll`, {
+                method: "put",
+                headers: { "Content-Type": "application/json" },
+            })
+                .then((res) => {
+                    if (res.ok) {
+                        window.location.href(`/chapter/${courseId}`);
+                    }
+                })
+                .catch((err) => console.error(err));
+        };
+    </script>
 </head>
 
 <body>
@@ -22,26 +37,33 @@
             </h2>
         </div>
         <div class="col-start-2 col-span-2">
-            <% if (chapters.length!==0) { %>
+            <% if (chapters.length !==0) { %>
                 <ul class="mt-5 text-2xl">
                     <% for (let i=0; i < chapters.length; i++) { %>
-                        <li class="border border-black mt-1">
-                            <a href="/pages/<%= chapters[i].id %>" class="p-2">
-                                <%= chapters[i].Cname %>
-                            </a>
+                        <li class="border border-black mt-1 relative">
+                            <div class="flex items-center justify-between p-2">
+                                <p class="flex-grow">
+                                    <%= chapters[i].Cname %>
+                                </p>
+                                <i class="fa fa-lock mr-5"></i>
+                            </div>
                         </li>
                         <% } %>
                 </ul>
                 <% } else { %>
                     <p class="mt-5 text-2xl">There are no chapters available. Create one?</p>
                     <% } %>
-                        <input type="hidden" name="courseId" id="" value="<%= courseId %>">
-                        <% if (admin==true) {%>
-                            <button onclick='window.location.href="/Newchapter/<%= courseId %>"'
-                                class="rounded text-white bg-green-600 py-2 px-5 hover:bg-green-900 font-medium mt-6">Create
-                                a new chapter</button>
-                            <%} %>
-
+        </div>
+        <div class="col-start-5 border-black border">
+            <h2 class="text-3xl flex justify-center items-center my-6">
+                <%= courseName %>
+            </h2>
+            <div class="flex justify-center items-center my-5">
+                <button onclick="enroll(<%= courseId %>)"
+                    class="rounded text-white bg-cyan-500 py-1 px-3 hover:bg-cyan-900 font-medium m-2">
+                    Enroll
+                </button>
+            </div>
         </div>
     </div>
 </body>

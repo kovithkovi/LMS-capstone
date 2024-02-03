@@ -162,17 +162,21 @@ app.get(
   }
 );
 
-app.put("/course/:courseId/enroll", async (request, response) => {
-  console.log(request.params.courseId);
-  const userId = request.user.id;
-  const course = await Course.findByPk(request.params.courseId);
-  console.log(course);
-  try {
-    await course.enrolled(userId);
-  } catch (err) {
-    console.log(err);
+app.put(
+  "/course/:courseId/enroll",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    console.log(request.params.courseId);
+    const userId = request.user.id;
+    const course = await Course.findByPk(request.params.courseId);
+    console.log(course);
+    try {
+      await course.enrolled(userId);
+    } catch (err) {
+      console.log(err);
+    }
   }
-});
+);
 // Define GET and POST routes for "/course"
 app.get(
   "/course",
@@ -257,22 +261,26 @@ app.get(
   }
 );
 
-app.post("/Newchapter", async (request, response) => {
-  try {
-    const courseid = request.body.courseId;
-    console.log(request.body.cName);
-    console.log(request.body.description);
-    console.log(courseid);
-    await Chapter.addChapter(
-      request.body.cName,
-      request.body.description,
-      courseid
-    );
-    response.redirect(`/chapter/${courseid}`);
-  } catch (err) {
-    console.log(err);
+app.post(
+  "/Newchapter",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      const courseid = request.body.courseId;
+      console.log(request.body.cName);
+      console.log(request.body.description);
+      console.log(courseid);
+      await Chapter.addChapter(
+        request.body.cName,
+        request.body.description,
+        courseid
+      );
+      response.redirect(`/chapter/${courseid}`);
+    } catch (err) {
+      console.log(err);
+    }
   }
-});
+);
 
 app.get(
   "/pages/:chapterId",
@@ -312,18 +320,22 @@ app.get(
   }
 );
 
-app.post("/Newpages", async (request, response) => {
-  try {
-    await Page.addPages(
-      request.body.title,
-      request.body.content,
-      request.body.chapterId
-    );
-    response.redirect(`/pages/${request.body.chapterId}`);
-  } catch (err) {
-    console.log(err);
+app.post(
+  "/Newpages",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      await Page.addPages(
+        request.body.title,
+        request.body.content,
+        request.body.chapterId
+      );
+      response.redirect(`/pages/${request.body.chapterId}`);
+    } catch (err) {
+      console.log(err);
+    }
   }
-});
+);
 
 app.get(
   "/page/:pageId",
@@ -349,15 +361,19 @@ app.get(
   }
 );
 
-app.put("/pages/:pageId/markAsCompleted", async (request, response) => {
-  const userId = request.user.id;
-  try {
-    const page = await Page.getPage(request.params.pageId);
-    await page.markAsCompleted(userId);
-  } catch (err) {
-    console.log(err);
+app.put(
+  "/pages/:pageId/markAsCompleted",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const userId = request.user.id;
+    try {
+      const page = await Page.getPage(request.params.pageId);
+      await page.markAsCompleted(userId);
+    } catch (err) {
+      console.log(err);
+    }
   }
-});
+);
 
 app.get(
   "/learner",
@@ -375,9 +391,20 @@ app.get(
   }
 );
 
-app.get("/courseView/:courseId", async (request, response) => {
-  response.render("courseView");
-});
+app.get(
+  "/courseView/:Id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const course = await Course.findByPk(request.params.Id);
+    console.log(course);
+    const chapters = await Chapter.getChaptersRespective(request.params.Id);
+    response.render("courseView", {
+      courseName: course.name,
+      chapters,
+      courseId: request.params.Id,
+    });
+  }
+);
 
 app.get("/makeadmin", async (request, response) => {
   const user = await User.findByPk(2);

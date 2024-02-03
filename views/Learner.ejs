@@ -12,9 +12,10 @@
                 method: "put",
                 headers: { "Content-Type": "application/json" },
             })
-                .then(() => {
-                    console.log("Enrollment successful, reloading page");
-                    window.location.reload();
+                .then((res) => {
+                    if (res.ok) {
+                        window.location.reload();
+                    }
                 })
                 .catch((err) => console.error(err));
         };
@@ -77,7 +78,7 @@
                             </h2>
                             <div class="ml-4 mt-4 mb-4">
                                 <button class="text-white bg-green-600 py-1 px-3 hover:bg-green-900 font-medium m-2"
-                                    onclick="window.location.href='/chapter/<%= i + 2 %>'">
+                                    onclick="window.location.href='/courseView/<%= Availablecourse[i].id %>'">
                                     View Course
                                 </button>
                                 <button onclick="enroll(<%= Availablecourse[i].id %>)"
