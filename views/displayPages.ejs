@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>">
     <title>New Page</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -12,14 +13,16 @@
         }
     </style>
     <script>
+        var token = document
+            .querySelector('meta[name="csrf-token"]')
+            .getAttribute('content')
         function PageUpdate(id) {
-            // console.log(id)
             fetch(`/pages/${id}/markAsCompleted`, {
                 method: "put",
                 headers: { "Content-Type": "application/json" },
-                // body: JSON.stringify({
-                //     "_csrf": token,
-                // })
+                body: JSON.stringify({
+                    "_csrf": token
+                })
             })
                 .then((res) => {
                     if (res.ok) {
@@ -33,6 +36,11 @@
 
 <body>
     <div class="grid grid-cols-12">
+        <div class="col-start-2 mt-5 text-2xl">
+            <% if(admin==true){%> <a href="/educator" class="text-[#1877f2] hover:border-b-2 border-[#1877f2]">Home</a>
+                <%} else {%> <a href="/learner" class="text-[#1877f2] hover:border-b-2 border-[#1877f2]">Home</a>
+                    <%} %>
+        </div>
         <div class="col-start-2 col-span-12 mt-12">
             <h1 class="text-4xl">
                 <%= title %>

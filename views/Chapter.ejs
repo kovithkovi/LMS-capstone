@@ -10,6 +10,11 @@
 
 <body>
     <div class="grid grid-cols-6">
+        <div class="col-start-2 mt-5 text-2xl">
+            <% if(admin==true){%> <a href="/educator" class="text-[#1877f2] hover:border-b-2 border-[#1877f2]">Home</a>
+                <%} else {%> <a href="/learner" class="text-[#1877f2] hover:border-b-2 border-[#1877f2]">Home</a>
+                    <%} %>
+        </div>
         <div class="col-start-2 col-span-2">
             <h1 class="mt-12 text-5xl">
                 <%= courseName %>

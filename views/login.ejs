@@ -18,6 +18,7 @@
         <div class="col-start-3 col-span-2">
             <h6 class="py-4 text-2xl border-b-2 border-black mb-5">Sign In as a user</h6>
             <form action="/session" method="post">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <div class="py-2">
                     <label for="email">Email: </label>
                     <input type="email" name="email" id="email"
@@ -27,10 +28,6 @@
                     <label for="password">Password: </label>
                     <input type="password" name="password" id="password"
                         class="rounded font-medium w-full my-1 p-2 border border-gray-600">
-                </div>
-                <div class="my-5">
-                    <a href="/changepassword" class="text-[#1877f2] hover:border-b-2 border-[#1877f2]">Forgotten
-                        password?</a>
                 </div>
                 <div class="py-2">
                     <button type="submit"

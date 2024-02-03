@@ -18,6 +18,7 @@
         <div class="col-start-3 col-span-2">
             <h6 class="py-4 text-2xl border-b-2 border-black">Sign Up as a new user</h6>
             <form action="/user" method="post">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <div class="py-2">
                     <label for="firstName">First Name: </label>
                     <input type="text" name="firstName" id="firstName"

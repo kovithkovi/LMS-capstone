@@ -10,8 +10,10 @@ const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
 const LocalStrategy = require("passport-local");
-const cookieParser = require("cookie-parser");
+var csrf = require("tiny-csrf");
+var cookieParser = require("cookie-parser");
 const bcrypt = require("bcrypt");
+const { ppid } = require("process");
 
 const saltRounds = 10;
 
@@ -19,7 +21,9 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cookieParser());
+// app.use(cookieParser());
+app.use(cookieParser("shh! some secret string"));
+app.use(csrf("this_should_be_32_character_long", ["POST", "PUT"]));
 app.use((req, res, next) => {
   req.User = req.user; // Assuming your authentication middleware sets the user on req.user
   next();
@@ -75,20 +79,32 @@ app.get("/", async (request, response) => {
 });
 
 app.get("/login", async (request, response) => {
-  response.render("login");
+  response.render("login", {
+    csrfToken: request.csrfToken(),
+  });
 });
 
-app.get("/changepassword", async (requset, response) => {
-  response.render("changePassword");
-});
+app.get(
+  "/changepassword",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (requset, response) => {
+    response.render("changePassword", {
+      csrfToken: requset.csrfToken(),
+    });
+  }
+);
 
-app.post("/changepassword", async (request, response) => {
-  const user = await User.getByEmail(request.body.email);
-  console.log(user);
-  const hasedPwd = await bcrypt.hash(request.body.password, saltRounds);
-  await user.updatePassword(hasedPwd);
-  response.redirect("/login");
-});
+app.post(
+  "/changepassword",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const user = await User.getByEmail(request.body.email);
+    console.log(user);
+    const hasedPwd = await bcrypt.hash(request.body.password, saltRounds);
+    await user.updatePassword(hasedPwd);
+    response.redirect("/login");
+  }
+);
 
 app.post(
   "/session",
@@ -102,7 +118,9 @@ app.post(
   }
 );
 app.get("/signup", async (request, response) => {
-  response.render("signup.ejs");
+  response.render("signup.ejs", {
+    csrfToken: request.csrfToken(),
+  });
 });
 
 app.get("/signout", async (request, response) => {
@@ -155,6 +173,7 @@ app.get(
         Availablecourse,
         enrollCourses,
         userName,
+        csrfToken: request.csrfToken(),
       });
     } catch (err) {
       console.log(err);
@@ -166,14 +185,14 @@ app.put(
   "/course/:courseId/enroll",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    console.log(request.params.courseId);
     const userId = request.user.id;
     const course = await Course.findByPk(request.params.courseId);
-    console.log(course);
     try {
-      await course.enrolled(userId);
+      const enroll = await course.enrolled(userId);
+      return response.json(enroll);
     } catch (err) {
       console.log(err);
+      return response.status(422).json(error);
     }
   }
 );
@@ -187,10 +206,12 @@ app.get(
       if (request.accepts("html")) {
         response.render("createNewCourse", {
           courses,
+          csrfToken: request.csrfToken(),
         });
       } else {
         response.json({
           courses,
+          csrfToken: request.csrfToken(),
         });
       }
     } catch (err) {
@@ -252,6 +273,7 @@ app.get(
     if (request.accepts("html")) {
       response.render("createNewChapter", {
         courseId,
+        csrfToken: request.csrfToken(),
       });
     } else {
       response.json({
@@ -313,6 +335,7 @@ app.get(
       console.log(chapterId);
       response.render("createNewPage", {
         chapterId,
+        csrfToken: request.csrfToken(),
       });
     } catch (err) {
       console.log(err);
@@ -341,22 +364,24 @@ app.get(
   "/page/:pageId",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    // console.log(request.params.pageId);
     const page = await Page.getPage(request.params.pageId);
     const pages = await Page.findAll({ where: { chapterId: page.chapterId } });
+    const users = await User.findByPk(request.user.id);
     const noPages = pages.length;
     console.log("No.of pages ****88", noPages);
     const completecheck = await Page.completeCheck(
       request.user.id,
       request.params.pageId
     );
-    // console.log(page.isCompleted);
     response.render("displayPages", {
       id: page.id,
       title: page.title,
       content: page.content,
       completed: completecheck,
       noPages,
+      chapterId: page.chapterId,
+      admin: users.admin,
+      csrfToken: request.csrfToken(),
     });
   }
 );
@@ -368,9 +393,11 @@ app.put(
     const userId = request.user.id;
     try {
       const page = await Page.getPage(request.params.pageId);
-      await page.markAsCompleted(userId);
+      const complete = await page.markAsCompleted(userId);
+      return response.json(complete);
     } catch (err) {
       console.log(err);
+      return response.status(422).json(error);
     }
   }
 );
@@ -387,6 +414,7 @@ app.get(
       Availablecourse,
       enrollCourses,
       userName,
+      csrfToken: request.csrfToken(),
     });
   }
 );
@@ -396,12 +424,14 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const course = await Course.findByPk(request.params.Id);
-    console.log(course);
     const chapters = await Chapter.getChaptersRespective(request.params.Id);
+    const users = await User.findByPk(request.user.id);
     response.render("courseView", {
       courseName: course.name,
       chapters,
       courseId: request.params.Id,
+      admin: users.admin,
+      csrfToken: request.csrfToken(),
     });
   }
 );

@@ -4,13 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>">
     <title>Educator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        var token = document
+            .querySelector('meta[name="csrf-token"]')
+            .getAttribute('content')
         function enroll(id) {
             fetch(`/course/${id}/enroll`, {
                 method: "put",
                 headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    "_csrf": token
+                })
             })
                 .then((res) => {
                     if (res.ok) {
@@ -32,7 +39,9 @@
             <h1 class="text-5xl">Welcome <%= userName %>
             </h1>
         </div>
-        <div class="col-start-4 flex items-center justify-center">
+        <div class="col-start-4 flex items-center justify-center flex-col mt-5">
+            <a href="/changepassword" class="text-[#1877f2] hover:border-b-2 border-[#1877f2] m-3">Change
+                password?</a>
             <button onclick="window.location.href='/signout'"
                 class="rounded text-white bg-red-600 py-1 px-3 hover:bg-red-900 font-medium m-2 ">SignOut</button>
         </div>
@@ -97,7 +106,7 @@
                             </h2>
                             <div class="ml-4 mt-4 mb-4">
                                 <button class="text-white bg-green-600 py-1 px-3 hover:bg-green-900 font-medium m-2"
-                                    onclick="window.location.href='/chapter/<%= Availablecourse[i].id %>'">
+                                    onclick="window.location.href='/courseView/<%= Availablecourse[i].id %>'">
                                     View Course
                                 </button>
                                 <button onclick="enroll(<%= Availablecourse[i].id %>)"

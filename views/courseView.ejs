@@ -4,18 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>">
     <title>Chapter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script>
+        var token = document
+            .querySelector('meta[name="csrf-token"]')
+            .getAttribute('content')
         function enroll(id) {
             fetch(`/course/${id}/enroll`, {
                 method: "put",
                 headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    "_csrf": token
+                })
             })
                 .then((res) => {
                     if (res.ok) {
-                        window.location.href(`/chapter/${courseId}`);
+                        window.location.replace(`/chapter/${id}`);
                     }
                 })
                 .catch((err) => console.error(err));
@@ -25,6 +32,11 @@
 
 <body>
     <div class="grid grid-cols-6">
+        <div class="col-start-2 mt-5 text-2xl">
+            <% if(admin==true){%> <a href="/educator" class="text-[#1877f2] hover:border-b-2 border-[#1877f2]">Home</a>
+                <%} else {%> <a href="/learner" class="text-[#1877f2] hover:border-b-2 border-[#1877f2]">Home</a>
+                    <%} %>
+        </div>
         <div class="col-start-2 col-span-2">
             <h1 class="mt-12 text-5xl">
                 <%= courseName %>
