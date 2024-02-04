@@ -179,6 +179,7 @@ app.get(
           };
         })
       );
+      console.log(totalPageCounts);
 
       const completionCounts = await Promise.all(
         enrollCourses.map(async (course) => {
@@ -195,7 +196,6 @@ app.get(
       );
       console.log(completionCounts);
       console.log(completionPercentages);
-      console.log(totalPageCounts);
       response.render("educator.ejs", {
         Availablecourse,
         enrollCourses,
@@ -541,7 +541,7 @@ app.get(
 );
 
 app.get("/makeadmin", async (request, response) => {
-  const user = await User.findByPk(2);
+  const user = await User.findByPk(3);
   user.makeadmin();
 });
 

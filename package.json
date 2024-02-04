@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon -e js,ejs",
-    "start:prod": "node index.js && npx sequelize-cli db:migrate ",
+    "start:prod": "node index.js && npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db: migrate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "kovith",
