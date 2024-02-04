@@ -98,11 +98,18 @@ app.post(
   "/changepassword",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    const user = await User.getByEmail(request.body.email);
-    console.log(user);
-    const hasedPwd = await bcrypt.hash(request.body.password, saltRounds);
-    await user.updatePassword(hasedPwd);
-    response.redirect("/login");
+    const user = await User.getUser(request.user.id);
+    const oldPassword = request.body.oldPassword;
+    const passwordsMatch = await bcrypt.compare(oldPassword, user.password);
+    if (passwordsMatch) {
+      const hasedPwd = await bcrypt.hash(request.body.password, saltRounds);
+      await user.updatePassword(hasedPwd);
+      if (user.admin == true) {
+        response.redirect("/educator");
+      }
+      response.redirect("/learner");
+    }
+    console.log("Wrong Password");
   }
 );
 
@@ -156,27 +163,88 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     try {
-      // Check if the user is an educator
       if (!request.user.admin) {
-        // If not an educator, redirect to learner dashboard or another appropriate page
         return response.redirect("/learner");
       }
       const userId = request.user.id;
-      // console.log(request.user);
       const Availablecourse = await Course.getAvailable(userId);
       const enrollCourses = await Course.getEnroll(userId);
-      // const enrollCourses = User.(userId);
-
       const userName = request.user.firstName;
-      console.log(userName);
+
+      const totalPageCounts = await Promise.all(
+        enrollCourses.map(async (course) => {
+          return {
+            courseId: course.id,
+            totalPageCount: await Page.getTotalPagesForCourse(course.id),
+          };
+        })
+      );
+
+      const completionCounts = await Promise.all(
+        enrollCourses.map(async (course) => {
+          return {
+            courseId: course.id,
+            completionCount: await Page.getCompletionCount(course.id, userId),
+          };
+        })
+      );
+      const completionPercentages = await Course.getCompletionPercentage(
+        userId,
+        completionCounts,
+        totalPageCounts
+      );
+      console.log(completionCounts);
+      console.log(completionPercentages);
+      console.log(totalPageCounts);
       response.render("educator.ejs", {
         Availablecourse,
         enrollCourses,
         userName,
+        completionPercentages,
         csrfToken: request.csrfToken(),
       });
     } catch (err) {
       console.log(err);
+    }
+  }
+);
+
+app.get(
+  "/mycourses",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const userId = request.user.id;
+    const user = await User.getUser(userId);
+    const courses = await Course.findAll({
+      where: { userId },
+    });
+    response.render("mycourse", { courses, admin: user.admin });
+  }
+);
+app.get(
+  "/educator/reports",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      const userId = request.user.id;
+      const user = await User.getUser(userId);
+      const educatorCourses = await Course.findAll({
+        where: { userId },
+      });
+      const courseReports = await Promise.all(
+        educatorCourses.map(async (course) => {
+          const enrollmentCount = await Course.getEnrollmentCount(course.id);
+          return {
+            courseId: course.id,
+            courseName: course.name,
+            enrollmentCount,
+          };
+        })
+      );
+      response.render("report", { courseReports, admin: user.admin });
+    } catch (error) {
+      console.error("Error fetching enrollment reports:", error);
+      response.status(500).send("Internal Server Error");
     }
   }
 );
@@ -410,10 +478,46 @@ app.get(
     const Availablecourse = await Course.getAvailable(userId);
     const enrollCourses = await Course.getEnroll(userId);
     const userName = request.user.firstName;
+
+    const totalPageCounts = await Promise.all(
+      enrollCourses.map(async (course) => {
+        return {
+          courseId: course.id,
+          totalPageCount: await Page.getTotalPagesForCourse(course.id),
+        };
+      })
+    );
+
+    const completionCounts = await Promise.all(
+      enrollCourses.map(async (course) => {
+        return {
+          courseId: course.id,
+          completionCount: await Page.getCompletionCount(course.id, userId),
+        };
+      })
+    );
+
+    const completionPercentages = completionCounts.map((completionCount) => {
+      const totalPageCount =
+        totalPageCounts.find(
+          (totalPage) => totalPage.courseId === completionCount.courseId
+        )?.totalPageCount || 0;
+
+      const completionPercentage =
+        totalPageCount > 0
+          ? (completionCount.completionCount / totalPageCount) * 100
+          : 0;
+      return {
+        courseId: completionCount.courseId,
+        completionPercentage,
+      };
+    });
+
     response.render("Learner", {
       Availablecourse,
       enrollCourses,
       userName,
+      completionPercentages,
       csrfToken: request.csrfToken(),
     });
   }

@@ -28,6 +28,44 @@ module.exports = (sequelize, DataTypes) => {
       return this.create({ name, userId });
     }
 
+    static async getCompletionPercentage(
+      userId,
+      completionCount,
+      totalPageCounts
+    ) {
+      try {
+        const courses = await this.findAll();
+        const completionPercentages = await Promise.all(
+          courses.map(async (course) => {
+            const totalPageCount = totalPageCounts.find(
+              (tpc) => tpc.courseId === course.id
+            ).totalPageCount;
+
+            // Check if totalPageCount is greater than zero to avoid NaN
+            const completionCountForCourse = completionCount.find(
+              (cc) => cc.courseId === course.id
+            ).completionCount;
+            const completionPercentage =
+              totalPageCount > 0
+                ? completionCountForCourse / totalPageCount
+                : 0;
+            const formattedPercentage = completionPercentage.toLocaleString(
+              undefined,
+              { style: "percent", maximumFractionDigits: 0 }
+            );
+            return {
+              courseId: course.id,
+              completionPercentage: formattedPercentage,
+            };
+          })
+        );
+        return completionPercentages;
+      } catch (error) {
+        console.error("Error calculating completion percentage:", error);
+        throw error;
+      }
+    }
+
     static getEnroll(userId) {
       return this.findAll({
         where: {
@@ -36,6 +74,19 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       });
+    }
+
+    static async getEnrollmentCount(courseId) {
+      try {
+        const course = await this.findByPk(courseId);
+        if (!course) {
+          throw new Error("Course not found");
+        }
+        return course.enroll.length;
+      } catch (error) {
+        console.error("Error getting enrollment count:", error);
+        throw error;
+      }
     }
 
     static getAvailable(userId) {

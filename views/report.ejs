@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educator Reports</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <div class="grid grid-cols-6">
+        <div class="col-start-2 mt-5 text-2xl">
+            <% if(admin==true){%> <a href="/educator" class="text-[#1877f2] hover:border-b-2 border-[#1877f2]">Home</a>
+                <%} else {%> <a href="/learner" class="text-[#1877f2] hover:border-b-2 border-[#1877f2]">Home</a>
+                    <%} %>
+        </div>
+        <div class="col-start-2">
+            <h1 class="text-2xl my-5 font-semibold">Educator Reports</h1>
+        </div>
+        <% for (let i=0; i < courseReports.length; i++) { %>
+            <div
+                class="col-start-<%= i%4 + 2 %> border border-black mb-5 mx-2 flex item-center justify-center flex-col">
+                <h2 class="text-2xl p-2 mb-1 text-center mt-4 font-semibold">
+                    <%= courseReports[i].courseName %>
+                </h2>
+                <p class="flex item-center justify-center mb-5">Enrollment Count: <%= courseReports[i].enrollmentCount
+                        %>
+                </p>
+            </div>
+            <% } %>
+    </div>
+</body>
+
+</html>

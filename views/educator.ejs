@@ -55,10 +55,12 @@
                 class="rounded text-white bg-blue-600 py-1 px-3 hover:bg-blue-900 font-medium m-2">Create a new
                 course</button>
             <br>
-            <button class="rounded text-white bg-green-600 py-1 px-3 hover:bg-green-900 font-medium m-2">My
+            <button class="rounded text-white bg-green-600 py-1 px-3 hover:bg-green-900 font-medium m-2"
+                onclick="window.location.href='/mycourses'">My
                 courses</button>
             <br>
-            <button class="rounded text-white bg-cyan-500 py-1 px-3 hover:bg-cyan-900 font-medium m-2">View
+            <button class="rounded text-white bg-cyan-500 py-1 px-3 hover:bg-cyan-900 font-medium m-2"
+                onclick="window.location.href='/educator/reports'">View
                 Reports</button>
         </div>
     </div>
@@ -77,10 +79,13 @@
                         </strong>
                     </h2>
                     <div class="flex items-center justify-center mt-4 mb-4">
-                        <button class="text-white bg-green-600 py-1 px-3 hover:bg-green-900 font-medium m-2"
-                            onclick="window.location.href='/chapter/<%= i + 2 %>'">
-                            View Course
+                        <button class="text-white bg-green-600 py-1 px-2 hover:bg-green-900 font-medium m-2"
+                            onclick="window.location.href='/chapter/<%= enrollCourses[i].id %>'">
+                            Continue
                         </button>
+                        <p class="border-black border text-white bg-blue-600 p-1">Completed: <%=
+                                completionPercentages.find(cp=> cp.courseId ===
+                                enrollCourses[i].id).completionPercentage %></p>
                     </div>
                 </div>
                 <% } %>

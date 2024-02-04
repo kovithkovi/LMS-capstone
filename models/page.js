@@ -85,6 +85,48 @@ module.exports = (sequelize, DataTypes) => {
         throw error;
       }
     }
+    static async getCompletionCount(courseId, userId) {
+      try {
+        const pages = await Page.findAll({
+          where: {
+            chapterId: {
+              [Op.in]: sequelize.literal(
+                `(SELECT "id" FROM "Chapters" WHERE "courseId" = ${courseId})`
+              ),
+            },
+          },
+        });
+        const completionCount = await Promise.all(
+          pages.map(async (page) => {
+            const isCompleted = await Page.completeCheck(userId, page.id);
+            return isCompleted ? 1 : 0;
+          })
+        );
+
+        return completionCount.reduce((sum, count) => sum + count, 0);
+      } catch (error) {
+        console.error("Error calculating completion count:", error);
+        throw error;
+      }
+    }
+
+    static async getTotalPagesForCourse(courseId) {
+      try {
+        const totalPageCount = await Page.count({
+          where: {
+            chapterId: {
+              [Op.in]: sequelize.literal(
+                `(SELECT "id" FROM "Chapters" WHERE "courseId" = ${courseId})`
+              ),
+            },
+          },
+        });
+        return totalPageCount;
+      } catch (error) {
+        console.error("Error counting total pages for course:", error);
+        throw error;
+      }
+    }
   }
   Page.init(
     {

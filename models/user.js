@@ -32,9 +32,9 @@ module.exports = (sequelize, DataTypes) => {
     updatePassword(password) {
       return this.update({ password: password });
     }
-    static getByEmail(email) {
+    static getUser(id) {
       return this.findOne({
-        where: { email },
+        where: { id },
       });
     }
   }
