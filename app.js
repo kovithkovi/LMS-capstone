@@ -170,7 +170,7 @@ app.get(
       const Availablecourse = await Course.getAvailable(userId);
       const enrollCourses = await Course.getEnroll(userId);
       const userName = request.user.firstName;
-
+      console.log(enrollCourses);
       const totalPageCounts = await Promise.all(
         enrollCourses.map(async (course) => {
           return {
@@ -189,11 +189,29 @@ app.get(
           };
         })
       );
-      const completionPercentages = await Course.getCompletionPercentage(
-        userId,
-        completionCounts,
-        totalPageCounts
-      );
+      const completionPercentages = completionCounts.map((completionCount) => {
+        const totalPage = totalPageCounts.find(
+          (totalPage) => totalPage.courseId === completionCount.courseId
+        );
+
+        if (!totalPage) {
+          throw new Error(
+            `Total page count not found for courseId: ${completionCount.courseId}`
+          );
+        }
+
+        const totalPageCount = totalPage.totalPageCount || 0;
+
+        const completionPercentage =
+          totalPageCount > 0
+            ? (completionCount.completionCount / totalPageCount) * 100
+            : 0;
+
+        return {
+          courseId: completionCount.courseId,
+          completionPercentage,
+        };
+      });
       console.log(completionCounts);
       console.log(completionPercentages);
       response.render("educator.ejs", {
