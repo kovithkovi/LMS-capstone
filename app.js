@@ -558,9 +558,13 @@ app.get(
   }
 );
 
-app.get("/makeadmin", async (request, response) => {
-  const user = await User.findByPk(3);
-  user.makeadmin();
-});
+app.get(
+  "/makeadmin",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const user = await User.findByPk(request.user.id);
+    user.makeadmin();
+  }
+);
 
 module.exports = app;
