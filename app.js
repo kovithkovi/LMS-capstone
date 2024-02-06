@@ -209,7 +209,7 @@ app.get(
 
         return {
           courseId: completionCount.courseId,
-          completionPercentage,
+          completionPercentage: Math.round(completionPercentage),
         };
       });
       console.log(completionCounts);
@@ -278,7 +278,7 @@ app.put(
       return response.json(enroll);
     } catch (err) {
       console.log(err);
-      return response.status(422).json(error);
+      return response.status(422).json(err);
     }
   }
 );
@@ -527,7 +527,7 @@ app.get(
           : 0;
       return {
         courseId: completionCount.courseId,
-        completionPercentage,
+        completionPercentage: Math.round(completionPercentage),
       };
     });
 
