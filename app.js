@@ -323,6 +323,25 @@ app.post("/course", async (request, response) => {
 });
 
 // Define GET route for "/chapter" at the top level
+app.get("/chapterenroll/:courseId", async (request, response) => {
+  try {
+    const userId = request.user.id;
+    const courseId = request.params.courseId;
+    const course = await Course.findByPk(courseId, {
+      where: { userId: userId },
+    });
+    const chapters = await Chapter.getChaptersRespective(courseId);
+    response.render("Chapter", {
+      courseName: course.name,
+      chapters,
+      courseId,
+      admin: false,
+    });
+  } catch (err) {
+    console.error(err);
+    response.status(500).send("Internal Server Error");
+  }
+});
 app.get(
   "/chapter/:courseId",
   connectEnsureLogin.ensureLoggedIn(),
@@ -451,6 +470,7 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const page = await Page.getPage(request.params.pageId);
+    console.log(page);
     const pages = await Page.findAll({ where: { chapterId: page.chapterId } });
     const users = await User.findByPk(request.user.id);
     const noPages = pages.length;
@@ -459,6 +479,7 @@ app.get(
       request.user.id,
       request.params.pageId
     );
+    const i = parseInt(request.query.i || 0);
     response.render("displayPages", {
       id: page.id,
       title: page.title,
@@ -468,6 +489,7 @@ app.get(
       chapterId: page.chapterId,
       admin: users.admin,
       csrfToken: request.csrfToken(),
+      i: i,
     });
   }
 );

@@ -41,6 +41,12 @@
                     <p class="mt-5 text-2xl">There are no chapters available. Create one?</p>
                     <% } %>
                         <input type="hidden" name="courseId" id="" value="<%= courseId %>">
+                        <% if (admin==true) {%>
+                            <button onclick="window.location.href='/Newchapter/<%= courseId %>'"
+                                class="rounded text-white bg-green-600 py-1 px-3 hover:bg-green-900  mt-8 text-xl">Create
+                                a New
+                                Chpater</button>
+                            <%} %>
         </div>
     </div>
 </body>
