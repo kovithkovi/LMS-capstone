@@ -586,6 +586,7 @@ app.get(
   async (request, response) => {
     const user = await User.findByPk(request.user.id);
     user.makeadmin();
+    response.redirect("/educator");
   }
 );
 
