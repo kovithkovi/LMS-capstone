@@ -336,6 +336,7 @@ app.get("/chapterenroll/:courseId", async (request, response) => {
       chapters,
       courseId,
       admin: false,
+      url: "/pagesenroll",
     });
   } catch (err) {
     console.error(err);
@@ -360,6 +361,7 @@ app.get(
         chapters,
         courseId,
         admin,
+        url: "/pages",
       });
     } catch (err) {
       console.error(err);
@@ -409,6 +411,26 @@ app.post(
   }
 );
 
+app.get(
+  "/pagesenroll/:chapterId",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      const chapterId = await request.params.chapterId;
+      const chapter = await Chapter.getChapter(chapterId);
+      const pages = await Page.getPagesRespective(chapterId);
+      console.log(pages);
+      response.render("Pages", {
+        chapterName: chapter.Cname,
+        pages,
+        chapterId,
+        admin: false,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+);
 app.get(
   "/pages/:chapterId",
   connectEnsureLogin.ensureLoggedIn(),

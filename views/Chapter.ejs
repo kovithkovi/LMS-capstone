@@ -31,7 +31,7 @@
                 <ul class="mt-5 text-2xl">
                     <% for (let i=0; i < chapters.length; i++) { %>
                         <li class="border border-black mt-5">
-                            <a href="/pages/<%= chapters[i].id %>" class="p-4">
+                            <a href="<%= url %>/<%= chapters[i].id %>" class="p-4">
                                 <%= chapters[i].Cname %>
                             </a>
                         </li>
